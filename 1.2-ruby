@@ -1,0 +1,26 @@
+def findNumberOfIncreases(depths)
+    previousDepth = 0
+    numberOfIncreases = 0
+    depths.each { |depth|
+        if (previousDepth != 0 && previousDepth.to_i < depth.to_i)
+            numberOfIncreases += 1
+        end
+        previousDepth = depth
+    }
+    
+    return numberOfIncreases
+end
+
+newDepths = []
+depths = ARGF.readlines
+
+depths.each_with_index { |depth, i|
+    if i >= depths.length - 3
+        break
+    end
+    
+    newDepths.push(depths[i].to_i + depths[i + 1].to_i + depths[i + 2].to_i)
+    newDepths.push(depths[i + 1].to_i + depths[i + 2].to_i + depths[i + 3].to_i)
+}
+
+puts findNumberOfIncreases(newDepths)
