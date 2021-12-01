@@ -1,0 +1,11 @@
+previousDepth = 0
+numberOfIncreases = 0
+ARGF.each { 
+    |depth|
+    if (previousDepth != 0 && previousDepth.to_i < depth.to_i)
+        numberOfIncreases += 1
+    end
+    previousDepth = depth
+}
+
+puts numberOfIncreases
