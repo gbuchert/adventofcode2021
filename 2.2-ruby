@@ -1,0 +1,23 @@
+movements = ARGF.read.split
+
+horizontalPosition = 0
+depth = 0
+aim = 0
+
+movements.each_with_index {
+    |movement, i|
+    if movement.to_i > 0
+        next
+    end
+    
+    if movement == 'forward'
+        horizontalPosition += movements[i + 1].to_i
+        depth += aim * movements[i + 1].to_i
+    elsif movement == 'down'
+        aim += movements[i + 1].to_i
+    elsif movement == 'up'
+        aim -= movements[i + 1].to_i
+    end
+}
+
+puts horizontalPosition * depth
