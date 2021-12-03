@@ -1,0 +1,43 @@
+def binaryTranslater(binaryValue, i=0)
+  product = binaryValue % 10 * 2**i
+  return product if binaryValue < 1
+  product + binaryTranslater(binaryValue / 10, i+1)
+end
+
+powerConsumptionValues = ARGF.readlines
+
+valueHash = {}
+
+powerConsumptionValues.each {
+    |powerConsumptionValue|
+    powerConsumptionValue.split('').each_with_index {
+        |splitPowerConsumptionValue, i|
+        if valueHash.has_key?(i)
+            if valueHash[i].has_key?(splitPowerConsumptionValue)
+                valueHash[i][splitPowerConsumptionValue] += 1
+            else
+               valueHash[i][splitPowerConsumptionValue] = 1
+            end    
+        else
+            valueHash[i] = {splitPowerConsumptionValue => 1}
+        end
+    }
+}
+
+largestValues = ''
+smallestValues = ''
+
+valueHash.each_value {
+    |values|
+    if values.has_key?('0') || values.has_key?('1')
+        if values['0'] > values['1']
+            largestValues = largestValues + '0'
+            smallestValues = smallestValues + '1'
+        else
+            largestValues = largestValues + '1'
+            smallestValues = smallestValues + '0'
+        end
+    end
+}
+
+puts binaryTranslater(largestValues.to_i) * binaryTranslater(smallestValues.to_i)
