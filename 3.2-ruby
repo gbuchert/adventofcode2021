@@ -1,0 +1,81 @@
+def binaryTranslater(binaryValue, i=0)
+  product = binaryValue % 10 * 2**i
+  return product if binaryValue < 1
+  product + binaryTranslater(binaryValue / 10, i+1)
+end
+
+def findPowerConsumptionValueBreakdown(powerConsumptionValues)
+    valueHash = {}
+
+    powerConsumptionValues.each {
+        |powerConsumptionValue|
+        powerConsumptionValue.split('').each_with_index {
+            |splitPowerConsumptionValue, i|
+            if valueHash.has_key?(i)
+                if valueHash[i].has_key?(splitPowerConsumptionValue)
+                    valueHash[i][splitPowerConsumptionValue] += 1
+                else
+                   valueHash[i][splitPowerConsumptionValue] = 1
+                end    
+            else
+                valueHash[i] = {splitPowerConsumptionValue => 1}
+            end
+        }
+    }
+    return valueHash
+end    
+
+def determineValueToKeep(valueSubHash, bitCritera, characterPosition)
+    valueToKeep = '1';
+    if valueSubHash.has_key?('0') && valueSubHash.has_key?('1')
+        if valueSubHash['0'] > valueSubHash['1']
+            if bitCritera == 'generator'
+                valueToKeep = '1'
+            else
+                valueToKeep = '0'
+            end 
+        else
+            if bitCritera == 'generator'
+                valueToKeep = '0'
+            else
+                valueToKeep = '1'
+            end   
+        end
+    end
+    
+    return valueToKeep
+end
+
+def filterValues(valueHash, bitCriteria)
+    values = @powerConsumptionValues.to_a
+    characterPosition = 0   
+            
+    while values.length > 1
+        keep = determineValueToKeep(valueHash[characterPosition], bitCriteria, characterPosition)
+        newValues = Array.new
+        
+        values.each {
+            |value|
+            if keep != value[characterPosition]
+                newValues.push(value)
+            end 
+        }
+        
+        values = newValues
+        characterPosition += 1
+        valueHash = findPowerConsumptionValueBreakdown(values)
+    end
+    
+    return values
+end
+
+
+
+@powerConsumptionValues = ARGF.readlines
+
+valueHash = findPowerConsumptionValueBreakdown(@powerConsumptionValues)
+
+generatorValue = filterValues(valueHash, 'generator')
+scrubberValue = filterValues(valueHash, 'scrubber')
+
+puts binaryTranslater(generatorValue[0].to_i) * binaryTranslater(scrubberValue[0].to_i)
