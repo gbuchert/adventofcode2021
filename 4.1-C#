@@ -1,0 +1,175 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+namespace MyApp
+{
+    public class Program
+    {
+        private record struct Cell(int Value, bool Bingo);
+
+        public static void Main(string[] args)
+        {
+            var arrayLines =
+                File.ReadAllLines(@"C:\Users\Cuchullion\RiderProjects\ConsoleApp1\ConsoleApp1\data_input.txt");
+            var listLines = arrayLines.ToList();
+
+            Console.WriteLine(ChallengeOne(listLines));
+        }
+
+
+        private static int ChallengeOne(List<string> arrayLines)
+        {
+            List<int> bingoBalls = ParseBingoBalls(arrayLines[0]);
+            arrayLines.Remove(arrayLines[0]);
+            List<Board> boards = generateBoards(arrayLines);
+            List<Tile> newRow = new List<Tile>();
+
+            (Board, int) winningBoard = determineWinningBoard(bingoBalls, boards);
+
+            int nonActivatedTileValue = 0;
+            foreach (List<Tile> column in winningBoard.Item1.Columns)
+            {
+                foreach (Tile tile in column)
+                {
+                    if (tile.Activated != true)
+                    {
+                        nonActivatedTileValue += tile.Value;
+                    }
+                }
+            }
+
+
+            return nonActivatedTileValue * winningBoard.Item2;
+        }
+
+        private static List<int> ParseBingoBalls(string bingoBallString)
+        {
+            return bingoBallString.Split(',').Select(Int32.Parse).ToList();
+        }
+
+        private static List<Board> generateBoards(List<string> arrayLines)
+        {
+            List<Board> boards = new List<Board>();
+            foreach (string line in arrayLines)
+            {
+                int boardNumber = 1;
+                
+                if (line == "")
+                {
+                    Board newBoard = new Board(boardNumber);
+                    boardNumber++;
+                    boards.Add(newBoard);
+                    continue;
+                }
+
+                Board board = boards.Last();
+
+                List<int> row = line.Split(" ", StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Select(Int32.Parse).ToList();
+                List<Tile> tileRow = new List<Tile>();
+                
+                foreach (int value in row)
+                {
+                    Tile tile = new Tile(value);
+                    tileRow.Add(tile);
+                }
+                
+                board.Rows.Add(tileRow);
+            }
+
+            foreach (Board board in boards)
+            {
+                foreach (List<Tile> row in board.Rows)
+                {
+                    int characterPosition = 0;
+                    foreach (Tile tile in row)
+                    {
+                        if (board.Columns.Count == characterPosition)
+                        {
+                            List<Tile> newColumn = new List<Tile>();
+                            board.Columns.Add(newColumn);
+                        }
+
+                        List<Tile> column = board.Columns[characterPosition];
+                        column.Add(tile);
+                        characterPosition++;
+                    }
+                    
+                }
+            }
+
+            return boards;
+        }
+
+        private static (Board, int) determineWinningBoard(List<int> bingoBalls, List<Board> boards)
+        {
+            foreach (int bingoBall in bingoBalls)
+            {
+                foreach (Board board in boards)
+                {
+                    board.Rows.AddRange(board.Columns);
+                    foreach (List<Tile> row in board.Rows)
+                    {
+                        int tilesActivated = 0;
+
+                        foreach (Tile tile in row)
+                        {
+                            if (tile.Value == bingoBall)
+                            {
+                                tile.Activated = true;
+                            }
+
+                            if (tile.Activated == true)
+                            {
+                                tilesActivated++;
+                            }
+                        }
+
+                        if (tilesActivated == row.Count)
+                        {
+
+                            foreach (Tile tile in row)
+                            {
+                                return (board, bingoBall);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return (null, 0);
+        }
+    }
+
+    public class Board
+    {
+        public List<List<Tile>> Rows { get; set; }
+        
+        public List<List<Tile>> Columns { get; set; }
+
+        public int BoardNumber { get; set; }
+
+        public bool ThatsABingo { get; set; }
+
+        public Board(int boardNumber)
+        {
+            this.BoardNumber = boardNumber;
+            this.ThatsABingo = false;
+            this.Rows = new List<List<Tile>>();
+            this.Columns = new List<List<Tile>>();
+        }
+    }
+
+    public class Tile
+    {
+        public int Value { get; set; }
+        public bool Activated { get; set; }
+
+        public Tile(int value)
+        {
+            this.Value = value;
+            this.Activated = false;
+        }
+    }
+}
