@@ -1,0 +1,63 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+namespace MyApp
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var arrayLines =
+                File.ReadAllLines(@"C:\Users\Cuchullion\RiderProjects\ConsoleApp1\ConsoleApp1\data_input.txt");
+            List<string> listLines = arrayLines.ToList();
+            Console.WriteLine(daySixChallenge(listLines));
+        }
+
+        public static int daySixChallenge(List<string> listLines)
+        {
+            List<int> lanternFishSpawningInput = listLines[0].Split(',').Select(Int32.Parse).ToList();
+            List<LanternFish> lanternFishes = new List<LanternFish>();
+
+            foreach (int spawnInput in lanternFishSpawningInput)
+            {
+                LanternFish lanternFish = new LanternFish(spawnInput);
+                lanternFishes.Add(lanternFish);
+            }
+
+            for (int i = 1; i <= 80; i++)
+            {
+                List<LanternFish> newDailyLanternFish = new List<LanternFish>();
+                
+                foreach (LanternFish lanternFish in lanternFishes)
+                {
+                    if (lanternFish.DaysUntilSpawning == 0)
+                    {
+                        LanternFish newLanternFish = new LanternFish(8);
+                        newDailyLanternFish.Add(newLanternFish);
+                        lanternFish.DaysUntilSpawning = 6;
+                    }
+                    else
+                    {
+                        lanternFish.DaysUntilSpawning--;
+                    }
+                }
+                
+                lanternFishes.AddRange(newDailyLanternFish);
+            }
+
+            return lanternFishes.Count();
+        }
+    }
+
+    public class LanternFish
+    {
+        public int DaysUntilSpawning { get; set; }
+
+        public LanternFish(int daysUntilSpawning)
+        {
+            this.DaysUntilSpawning = daysUntilSpawning;
+        }
+    }
+}
