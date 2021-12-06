@@ -1,0 +1,51 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+namespace MyApp
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var arrayLines =
+                File.ReadAllLines(@"C:\Users\Cuchullion\RiderProjects\ConsoleApp1\ConsoleApp1\data_input.txt");
+            List<string> listLines = arrayLines.ToList();
+            Console.WriteLine(daySixChallenge(listLines));
+        }
+
+        public static long daySixChallenge(List<string> listLines)
+        {
+            long[] lanternFishes = new long[9];
+            List<int> lanternFishSpawningInput = listLines[0].Split(',').Select(Int32.Parse).ToList();
+
+            for (int i = 0; i < lanternFishSpawningInput.Count; i++)
+            {
+                lanternFishes[lanternFishSpawningInput[i]]++;
+            }
+
+            for (int x = 0; x < 256; x++)
+            {
+                long spawningFish = lanternFishes[0];
+                lanternFishes[0] = lanternFishes[1];
+                lanternFishes[1] = lanternFishes[2];
+                lanternFishes[2] = lanternFishes[3];
+                lanternFishes[3] = lanternFishes[4];
+                lanternFishes[4] = lanternFishes[5];
+                lanternFishes[5] = lanternFishes[6];
+                lanternFishes[6] = lanternFishes[7] + spawningFish;
+                lanternFishes[7] = lanternFishes[8];
+                lanternFishes[8] = spawningFish;
+            }
+
+            long totalFish = 0;
+            for (int i = 0; i < 9; i++)
+            {
+                totalFish += lanternFishes[i];
+            }
+            
+            return totalFish;
+        }
+    }
+}
