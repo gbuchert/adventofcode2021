@@ -1,0 +1,45 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+namespace MyApp
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var arrayLines =
+                File.ReadAllLines(@"C:\Users\Cuchullion\RiderProjects\ConsoleApp1\ConsoleApp1\data_input.txt");
+            List<string> listLines = arrayLines.ToList();
+            Console.WriteLine(daySevenChallenge(listLines));
+        }
+
+        public static int daySevenChallenge(List<string> listLines)
+        {
+            int[] crabPositions = listLines[0].Split(',').Select(Int32.Parse).ToArray();
+            Array.Sort(crabPositions);
+            int boundaryCrabPosition = crabPositions.Last() / 2;
+            Dictionary<int, int> fuelUsagePositions = new Dictionary<int, int>();
+
+            for (int i = 1; i <= boundaryCrabPosition; i++)
+            {
+                int totalFuelSpent = 0;
+                foreach (int crabPosition in crabPositions)
+                {
+                    totalFuelSpent += Math.Abs(crabPosition - i);
+                }
+
+                fuelUsagePositions.Add(i, totalFuelSpent);
+            }
+
+            foreach (var fuelUsagePosition in fuelUsagePositions.OrderBy(key => key.Value))
+            {
+                return fuelUsagePosition.Value;
+            }
+
+
+            return 0;
+        }
+    }
+}
