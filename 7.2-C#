@@ -1,0 +1,48 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+namespace MyApp
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var arrayLines =
+                File.ReadAllLines(@"C:\Users\Cuchullion\RiderProjects\ConsoleApp1\ConsoleApp1\data_input.txt");
+            List<string> listLines = arrayLines.ToList();
+            Console.WriteLine(daySevenChallenge(listLines));
+        }
+
+        public static int daySevenChallenge(List<string> listLines)
+        {
+            int[] crabPositions = listLines[0].Split(',').Select(Int32.Parse).ToArray();
+            List<int> fuelCosts = new List<int>();
+
+            for (int i = 1; i <= crabPositions.Max(); i++)
+            {
+                List<int> roundCost = new List<int>();
+
+                foreach (int crabPosition in crabPositions)
+                {
+                    int additionalFuelCost = 1;
+                    int fuelCost = 0;
+                    int delta = crabPosition > i ? crabPosition - i : i - crabPosition;
+
+                    for (int y = 0; y < delta; y++)
+                    {
+                        fuelCost += additionalFuelCost;
+                        additionalFuelCost++;
+                    }
+
+                    roundCost.Add(fuelCost);
+                }
+                
+                fuelCosts.Add(roundCost.Sum());
+            }
+
+            return fuelCosts.Min();
+        }
+    }
+}
