@@ -1,0 +1,51 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Linq;
+
+namespace MyApp
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<string> input = File.ReadAllLines(@"C:\Users\Cuchullion\RiderProjects\ConsoleApp1\ConsoleApp1\data_input.txt").ToList();
+            Console.WriteLine(DayEightChallenge(input));
+        }
+
+        public static int DayEightChallenge(List<string> input)
+        {
+            int instances = 0;
+            for (int i = 0; i < input.Count; i++)
+            {
+                List<string> uniqueSignalsAndOutput = input[i].Split('|').ToList();
+                List<string> uniqueSignals = uniqueSignalsAndOutput[0].Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+                List<string> outputSignals = uniqueSignalsAndOutput[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+                
+                foreach (string output in outputSignals)
+                {
+                    int stringSize = output.Length;
+
+                    switch (output.Length)
+                    {
+                        case 2:
+                            instances++;
+                            break;
+                        case 4:
+                            instances++;
+                            break;
+                        case 3:
+                            instances++;
+                            break;
+                        case 7:
+                            instances++;
+                            break;
+                    }
+                }
+            }
+
+            return instances;
+        }
+    }
+}
