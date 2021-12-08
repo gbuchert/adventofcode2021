@@ -1,0 +1,100 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Linq;
+
+namespace MyApp
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<string> input = File.ReadAllLines(@"C:\Users\Cuchullion\RiderProjects\ConsoleApp1\ConsoleApp1\data_input.txt").ToList();
+            Console.WriteLine(DayEightChallenge(input));
+        }
+
+        public static int DayEightChallenge(List<string> input)
+        {
+            List<int> calculatedValues = new List<int>();
+            
+            for (int i = 0; i < input.Count; i++)
+            {
+                List<string> uniqueSignalsAndOutput = input[i].Split('|').ToList();
+                List<string> uniqueSignals = uniqueSignalsAndOutput[0].Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+                List<string> outputSignals = uniqueSignalsAndOutput[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+                
+                var inputPattern= uniqueSignals.Where(x => x.Length == 2 || x.Length == 3 || x.Length == 4 || x.Length == 7).OrderBy(i => i.Length).ToArray();
+                string constructedString = "";
+                
+                foreach (string output in outputSignals)
+                {
+                    int stringSize = output.Length;
+
+                    switch (output.Length)
+                    {
+                        case 2:
+                            constructedString = constructedString + "1";
+                            break;
+                        case 4:
+                            constructedString = constructedString + "4";
+                            break;
+                        case 3:
+                            constructedString = constructedString + "7";
+                            break;
+                        case 7:
+                            constructedString = constructedString + "8";
+                            break;
+                        case 5:
+                            constructedString = constructedString + determineValue(inputPattern, output);
+                            break;
+                        case 6:
+                            constructedString = constructedString + determineValue(inputPattern, output);
+                            break;
+                    }
+                }
+                
+                calculatedValues.Add(Int32.Parse(constructedString));
+            }
+
+            return calculatedValues.Sum();
+        }
+
+        public static string determineValue(string[] pattern, string line)
+        {
+            string foundValue = "";
+            if (line.Length == 5)
+            {
+                if (pattern[0].All(x => line.Contains(x)))
+                {
+                    foundValue = "3";
+                }
+                else if (pattern[3].Where(x => !pattern[2].Contains(x)).All(x => line.Contains(x)))
+                {
+                    foundValue = "2";
+                }
+                else
+                {
+                    foundValue = "5";
+                }
+            }
+            else
+            {
+                if (pattern[2].All(x => line.Contains(x)))
+                {
+                    foundValue = "9";
+                }
+                else if (pattern[1].All(x => line.Contains(x)))
+                {
+                    foundValue = "0";
+                }
+                else
+                {
+                    foundValue = "6";
+                }
+            }
+
+            return foundValue;
+        }
+    }
+}
