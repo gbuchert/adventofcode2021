@@ -1,0 +1,108 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Linq;
+
+namespace MyApp
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<string> input = File.ReadAllLines(@"C:\Users\Cuchullion\RiderProjects\ConsoleApp1\ConsoleApp1\data_input.txt").ToList();
+            Console.WriteLine(DayNineChallenge(input));
+        }
+
+        public static int DayNineChallenge(List<string> input)
+        {
+            Dictionary<int, Dictionary<int, int>> depthReadingValues = new Dictionary<int, Dictionary<int, int>>();
+            int sumRiskLevels = 0;
+
+            for (int i = 0; i < input.Count; i++)
+            {
+                Dictionary<int, int> inputReadingValues = new Dictionary<int, int>();
+                for (int j = 0; j < input[i].Length; j++)
+                {
+                    inputReadingValues.Add(j, Convert.ToInt32(input[i][j].ToString()));
+                }
+
+                depthReadingValues.Add(i, inputReadingValues);
+            }
+
+            List<int> lowPoints = new List<int>();
+            for (int i = 0; i < depthReadingValues.Count; i++)
+            {
+                for (int j = 0; j < depthReadingValues[i].Count; j++)
+                {
+                    int valueToCompare = depthReadingValues[i][j];
+                    int lowestValue = valueToCompare;
+                    bool skipValue = true;
+
+                    if (depthReadingValues.ContainsKey(i - 1))
+                    {
+                        if (depthReadingValues[i - 1][j] != valueToCompare)
+                        {
+                            skipValue = false;
+                        }
+                        
+                        if (depthReadingValues[i - 1][j] < valueToCompare)
+                        {
+                            lowestValue = depthReadingValues[i - 1][j];
+                        }
+                    }
+
+                    if (depthReadingValues.ContainsKey(i + 1))
+                    {
+                        if (depthReadingValues[i + 1][j] != valueToCompare)
+                        {
+                            skipValue = false;
+                        }
+                        
+                        if (depthReadingValues[i + 1][j] < valueToCompare)
+                        {
+                            lowestValue = depthReadingValues[i + 1][j];
+                        }
+                    }
+
+                    if (depthReadingValues[i].ContainsKey(j - 1))
+                    {
+                        if (depthReadingValues[i][j - 1] != valueToCompare)
+                        {
+                            skipValue = false;
+                        }
+                        
+                        if (depthReadingValues[i][j - 1] < valueToCompare)
+                        {
+                            lowestValue = depthReadingValues[i][j - 1];
+                        }
+                    }
+ 
+                    if (depthReadingValues[i].ContainsKey(j + 1))
+                    {
+                        if (depthReadingValues[i][j + 1] != valueToCompare)
+                        {
+                            skipValue = false;
+                        }
+                        
+                        if (depthReadingValues[i][j + 1] < valueToCompare)
+                        {
+                            lowestValue = depthReadingValues[i][j + 1];
+                        }
+                    }
+
+                    if (!skipValue)
+                    {
+                        if (lowestValue == valueToCompare)
+                        {
+                            sumRiskLevels = sumRiskLevels + (1 + valueToCompare);
+                            lowPoints.Add(valueToCompare);
+                        }
+                    }
+                }
+            }
+
+            return sumRiskLevels;
+        }
+    }
+}
