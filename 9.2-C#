@@ -1,0 +1,294 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Linq;
+
+namespace MyApp
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<string> input = File.ReadAllLines(@"C:\Users\Cuchullion\RiderProjects\ConsoleApp1\ConsoleApp1\data_input.txt").ToList();
+            Console.WriteLine(DayNineChallenge(input));
+        }
+
+        public static int DayNineChallenge(List<string> input)
+        {
+            Dictionary<int, Dictionary<int, int>> depthReadingValues = new Dictionary<int, Dictionary<int, int>>();
+            int sumRiskLevels = 0;
+
+            for (int i = 0; i < input.Count; i++)
+            {
+                Dictionary<int, int> inputReadingValues = new Dictionary<int, int>();
+                for (int j = 0; j < input[i].Length; j++)
+                {
+                    inputReadingValues.Add(j, Convert.ToInt32(input[i][j].ToString()));
+                }
+
+                depthReadingValues.Add(i, inputReadingValues);
+            }
+
+            List<int> basins = new List<int>();
+            for (int row = 0; row < depthReadingValues.Count; row++)
+            {
+                for (int column = 0; column < depthReadingValues[row].Count; column++)
+                {
+                    int valueToCompare = depthReadingValues[row][column];
+                    int lowestValue = valueToCompare;
+                    bool skipValue = true;
+                    int basinValues = 0;
+
+                    if (depthReadingValues.ContainsKey(row - 1))
+                    {
+                        if (depthReadingValues[row - 1][column] != valueToCompare)
+                        {
+                            skipValue = false;
+                        }
+                        
+                        if (depthReadingValues[row - 1][column] < valueToCompare)
+                        {
+                            lowestValue = depthReadingValues[row - 1][column];
+                        }
+                    }
+
+                    if (depthReadingValues.ContainsKey(row + 1))
+                    {
+                        if (depthReadingValues[row + 1][column] != valueToCompare)
+                        {
+                            skipValue = false;
+                        }
+                        
+                        if (depthReadingValues[row + 1][column] < valueToCompare)
+                        {
+                            lowestValue = depthReadingValues[row + 1][column];
+                        }
+                    }
+
+                    if (depthReadingValues[row].ContainsKey(column - 1))
+                    {
+                        if (depthReadingValues[row][column - 1] != valueToCompare)
+                        {
+                            skipValue = false;
+                        }
+                        
+                        if (depthReadingValues[row][column - 1] < valueToCompare)
+                        {
+                            lowestValue = depthReadingValues[row][column - 1];
+                        }
+                    }
+ 
+                    if (depthReadingValues[row].ContainsKey(column + 1))
+                    {
+                        if (depthReadingValues[row][column + 1] != valueToCompare)
+                        {
+                            skipValue = false;
+                        }
+                        
+                        if (depthReadingValues[row][column + 1] < valueToCompare)
+                        {
+                            lowestValue = depthReadingValues[row][column + 1];
+                        }
+                    }
+
+                    if (!skipValue)
+                    {
+                        if (lowestValue == valueToCompare)
+                        {
+                            basinValues++;
+                            Console.WriteLine(valueToCompare);
+                            //determine up values
+                            int basinValue = 0;
+                            int spotToSearch = row - 1;
+                            do
+                            {
+                                if (!depthReadingValues.ContainsKey(spotToSearch))
+                                {
+                                    break;
+                                }
+
+                                basinValue = depthReadingValues[spotToSearch][column];
+                                Console.WriteLine("up " + basinValue);
+
+                                if (basinValue != 9)
+                                {
+                                    Console.WriteLine("bump");
+                                    basinValues++;
+                                }
+
+                                spotToSearch--;
+                            } while (basinValue != 9);
+                            
+                            //determine down values
+                            basinValue = 0;
+                            spotToSearch = row + 1;
+                            do
+                            {
+                                if (!depthReadingValues.ContainsKey(spotToSearch))
+                                {
+                                    break;
+                                }
+
+                                basinValue = depthReadingValues[spotToSearch][column];
+                                Console.WriteLine("down " + basinValue);
+
+                                if (basinValue != 9)
+                                {
+                                    Console.WriteLine("bump");
+                                    basinValues++;
+                                }
+                                
+                                spotToSearch++;
+                            } while (basinValue != 9);
+                            
+                            //determine left values
+                            basinValue = 0;
+                            spotToSearch = column - 1;
+                            do
+                            {
+                                if (!depthReadingValues[row].ContainsKey(spotToSearch))
+                                {
+                                    break;
+                                }
+
+                                basinValue = depthReadingValues[row][spotToSearch];
+                                Console.WriteLine("left " + basinValue);
+
+                                if (basinValue != 9)
+                                {
+                                    Console.WriteLine("bump");
+                                    basinValues++;
+                                }
+
+                                if (basinValue != 9)
+                                {
+                                    //determine up values for left spot
+                                    int upBasinValue = 0;
+                                    int upSpotToSearch = row - 1;
+                                    do
+                                    {
+                                        if (!depthReadingValues.ContainsKey(upSpotToSearch))
+                                        {
+                                            break;
+                                        }
+
+                                        upBasinValue = depthReadingValues[upSpotToSearch][spotToSearch];
+                                        Console.WriteLine("left up " + upBasinValue);
+
+                                        if (upBasinValue != 9)
+                                        {
+                                            Console.WriteLine("bump");
+                                            basinValues++;
+                                        }
+
+                                        upSpotToSearch--;
+                                    } while (upBasinValue != 9);
+
+                                    //determine down values for left spot
+                                    int downBasinValue = 0;
+                                    int downSpotToSearch = row + 1;
+                                    do
+                                    {
+                                        if (!depthReadingValues.ContainsKey(downSpotToSearch))
+                                        {
+                                            break;
+                                        }
+
+                                        downBasinValue = depthReadingValues[downSpotToSearch][spotToSearch];
+                                        Console.WriteLine("left down " + downBasinValue);
+
+                                        if (downBasinValue != 9)
+                                        {
+                                            Console.WriteLine("bump");
+                                            basinValues++;
+                                        }
+
+                                        downSpotToSearch++;
+                                    } while (downBasinValue != 9);
+                                }
+
+                                spotToSearch--;
+                            } while (basinValue != 9);
+                            
+                            //determine right values
+                            basinValue = 0;
+                            spotToSearch = column + 1;
+                            do
+                            {
+                                if (!depthReadingValues[row].ContainsKey(spotToSearch))
+                                {
+                                    break;
+                                }
+
+                                basinValue = depthReadingValues[row][spotToSearch];
+                                Console.WriteLine("right " + basinValue);
+
+                                if (basinValue != 9)
+                                {
+                                    Console.WriteLine("bump");
+                                    basinValues++;
+                                }
+
+                                if (basinValue != 9)
+                                {
+                                    //determine up values for right spot
+                                    int upBasinValue = 0;
+                                    int upSpotToSearch = row - 1;
+                                    do
+                                    {
+                                        if (!depthReadingValues.ContainsKey(upSpotToSearch))
+                                        {
+                                            break;
+                                        }
+
+                                        upBasinValue = depthReadingValues[upSpotToSearch][spotToSearch];
+                                        Console.WriteLine("right up " + upBasinValue);
+
+                                        if (upBasinValue != 9)
+                                        {
+                                            Console.WriteLine("bump");
+                                            basinValues++;
+                                        }
+
+                                        upSpotToSearch--;
+                                    } while (upBasinValue != 9);
+
+                                    //determine down values for right spot
+                                    int downBasinValue = 0;
+                                    int downSpotToSearch = row + 1;
+                                    do
+                                    {
+                                        if (!depthReadingValues.ContainsKey(downSpotToSearch))
+                                        {
+                                            break;
+                                        }
+
+                                        downBasinValue = depthReadingValues[downSpotToSearch][spotToSearch];
+                                        Console.WriteLine("right down " + downBasinValue);
+
+                                        if (downBasinValue != 9)
+                                        {
+                                            Console.WriteLine("bump");
+                                            basinValues++;
+                                        }
+
+                                        downSpotToSearch++;
+                                    } while (downBasinValue != 9);
+                                }
+
+                                spotToSearch++;
+                            } while (basinValue != 9);
+                            
+                            basins.Add(basinValues);
+                        }
+                    }
+                }
+            }
+            
+            basins.Sort((a, b) => b.CompareTo(a));
+
+            return basins[0] * basins[1] * basins[2];
+        }
+    }
+}
