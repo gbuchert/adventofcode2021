@@ -1,0 +1,62 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+namespace MyApp
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<string> input = File.ReadAllLines(@"C:\Users\Cuchullion\RiderProjects\ConsoleApp1\ConsoleApp1\data_input.txt").ToList();
+            Console.WriteLine(dayTenChallenge(input));
+        }
+
+        public static long dayTenChallenge(List<string> input)
+        {
+            long errorScore = 0;
+
+            foreach (string line in input)
+            {
+                errorScore = errorScore + parseLine(line);
+            }
+
+            return errorScore;
+        }
+
+        public static long parseLine(string line)
+        {
+            List<char> lastOpenCharacter = new List<char>();
+                char[] openingCharacters = new char[]{ '(', '{', '[', '<'};
+
+                foreach (char character in line)
+                {
+                    if (openingCharacters.Contains(character))
+                    {
+                        lastOpenCharacter.Add(character);
+                    }
+                    else
+                    {
+                        if (lastOpenCharacter.Count == 0 || Math.Abs(character - lastOpenCharacter.Last()) > 2)
+                        {
+                            return character switch
+                            {
+                                ')' => 3,
+                                ']' => 57,
+                                '}' => 1197,
+                                '>' => 25137
+                            };
+                        }
+                        else
+                        {
+                            lastOpenCharacter.RemoveAt(lastOpenCharacter.Count - 1);
+                        }
+                    }
+                }
+
+                return default;
+        }
+        
+    }
+}
