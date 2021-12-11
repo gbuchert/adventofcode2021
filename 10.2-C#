@@ -1,0 +1,91 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+namespace MyApp
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<string> input = File.ReadAllLines(@"C:\Users\Cuchullion\RiderProjects\ConsoleApp1\ConsoleApp1\data_input.txt").ToList();
+            Console.WriteLine(dayTenChallenge(input, false));
+        }
+
+        public static long dayTenChallenge(List<string> input, bool returnCorrupted)
+        {
+            long errorScore = 0;
+            List<long> returnedValues = new List<long>();
+
+            foreach (string line in input)
+            {
+                returnedValues.Add(parseLine(line, false));
+            }
+
+            returnedValues.RemoveAll(p => p == -1);
+            returnedValues.Sort();
+
+            return returnedValues[returnedValues.Count / 2];
+        }
+
+        public static long parseLine(string line, bool returnCorrupted)
+        {
+            List<char> lastOpenCharacters = new List<char>();
+                char[] openingCharacters = new char[]{ '(', '{', '[', '<'};
+                long result = 0;
+
+                foreach (char character in line)
+                {
+                    if (openingCharacters.Contains(character))
+                    {
+                        lastOpenCharacters.Add(character);
+                    }
+                    else
+                    {
+                        if (lastOpenCharacters.Count == 0 || Math.Abs(character - lastOpenCharacters.Last()) > 2)
+                        {
+                            if (returnCorrupted)
+                            {
+                                return character switch
+                                {
+                                    ')' => 3,
+                                    ']' => 57,
+                                    '}' => 1197,
+                                    '<' => 25137
+                                };
+                            }
+                            else
+                            {
+                                return -1;
+                            }
+                        }
+                        else
+                        {
+                            lastOpenCharacters.RemoveAt(lastOpenCharacters.Count - 1);
+                        }
+                    }
+                }
+                
+                if (!returnCorrupted)
+                {
+                    lastOpenCharacters.Reverse();
+                    foreach (char openBracket in lastOpenCharacters)
+                    {
+                        result = result * 5 + openBracket switch
+                        {
+                            '(' => 1,
+                            '[' => 2,
+                            '{' => 3,
+                            '<' => 4
+                        };
+                    }
+
+                    return result;
+                }
+
+                return default;
+        }
+        
+    }
+}
